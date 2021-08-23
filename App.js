@@ -1,31 +1,36 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 //import liraries npx react-native run-android
 import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, FlatList} from 'react-native';
+import {View, Text, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
 import Day from './Day';
 // import CalendarAux from './CalenderAux';
-
-// create a component
-//1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7,
 
 const App = () => {
   const [nav, setNav] = useState(0);
   const [days, setDays] = useState();
   const [dateDisplay, setDateDisplay] = useState('');
+  const [currentDay, setCurrentDay] = useState(true);
+  const [isCurrentDay2, setisCurrentDay2] = useState(true);
+  const [borders, setBorders] = useState(null);
   // console.log('1', dateDisplay);
   const dt2 = new Date();
+  const day = dt2.getDate();
+  const month = dt2.getMonth();
+  const year = dt2.getFullYear();
+
   // const eventForDate = date => events.find(e => e.date === date);
 
   useEffect(() => {
     // const weekdays = ["Sunday",'Monday', 'T', 'W', 'T', 'F', 'S', 'S'];
-    const weekdays = [
-      'Sunday',
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-    ];
+    // const weekdays = [
+    //   'Sunday',
+    //   'Monday',
+    //   'Tuesday',
+    //   'Wednesday',
+    //   'Thursday',
+    //   'Friday',
+    //   'Saturday',
+    // ];
     const dt = new Date();
 
     if (nav !== 0) {
@@ -63,14 +68,15 @@ const App = () => {
     console.log(
       'first Day Of Month---',
       firstDayOfMonth,
-      '@@@@',
+      '--',
       firstDayOfMonth2,
     );
     console.log('dateString', dateString);
+    console.log('Borders---', borders);
     console.log('dateString.split(', ')[0]', dateString.split(', ')[0]);
     console.log('days In Month---', daysInMonth);
     console.log('paddingDays', paddingDays);
-    console.log(day, month, year);
+    console.log(day, month + 1, year);
     // console.log(weekdays[getDay]);
     console.log('date display----', dateDisplay);
     console.log('firstDayOfMonthDay', firstDayOfMonthDay);
@@ -84,12 +90,14 @@ const App = () => {
       if (i > paddingDays) {
         daysArr.push({
           value: i - paddingDays,
+          month: month + 1,
           isCurrentDay: i - paddingDays === day && nav === 0,
           date: dayString,
         });
       } else {
         daysArr.push({
           value: 'padding',
+          month: null,
           isCurrentDay: false,
           date: '',
         });
@@ -97,11 +105,22 @@ const App = () => {
     }
     // console.log('2', daysArr);
     setDays(daysArr);
+    setBorders(null);
+    setisCurrentDay2(true);
   }, [nav, dateDisplay]);
 
   return (
     <View style={styles.container}>
+      <View style={styles.containerCalendar}>
+        <Text style={styles.calendarTxt}>Calendar</Text>
+      </View>
       <View style={styles.monthContainer}>
+        <View style={styles.container4}>
+          <Text style={styles.TodayTxt}>
+            {isCurrentDay2 ? 'Today' : currentDay}
+            {/* {currentDay} */}
+          </Text>
+        </View>
         <Text style={styles.AugTxt}>
           {dt2.toString().slice(3, 7) + ' '}
           {dt2.getFullYear()}
@@ -123,7 +142,26 @@ const App = () => {
           numColumns={7}
           keyExtractor={(_, index) => index.toString()}
           renderItem={({item}) => (
-            <Day date={item.value} isCurrentDay={item.isCurrentDay} />
+            <TouchableOpacity
+              onPress={() => {
+                item.value === 'padding'
+                  ? setisCurrentDay2(true)
+                  : setisCurrentDay2(null);
+
+                item.isCurrentDay
+                  ? setCurrentDay('Today')
+                  : setCurrentDay(`${item.value}/${item.month}/${year}`);
+                // setParticularClick(true);
+                // console.log(currentDay);
+                item.isCurrentDay ? setBorders(null) : setBorders(item.value);
+              }}>
+              <Day
+                date={item.value}
+                isCurrentDay={item.isCurrentDay}
+                // particularClick={particularClick}
+                borders={borders}
+              />
+            </TouchableOpacity>
           )}
         />
       </View>
@@ -155,6 +193,22 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'grey',
   },
+  containerCalendar: {
+    // flex: 1,
+    justifyContent: 'center',
+    // alignItems: 'center',
+    // backgroundColor: 'lightblue',
+    height: 50,
+    width: 180,
+    right: 125,
+    // alignItems: 'flex-start',
+  },
+  calendarTxt: {
+    alignSelf: 'center',
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#616161',
+  },
   daysContainer: {
     // backgroundColor: 'yellow',
     // flexDirection: 'row',
@@ -163,6 +217,21 @@ const styles = StyleSheet.create({
     width: 400,
     // overflow: 'hidden',
     // top: 10,
+  },
+  container4: {
+    // flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    // backgroundColor: 'teal',
+    height: '80%',
+    width: '33%',
+    borderWidth: 1,
+    borderColor: 'grey',
+    borderRadius: 50,
+    // top: 60,
+    // left: 40,
+    // right: 20,
+    left: 10,
   },
   eachContainer: {
     height: 50,
@@ -173,17 +242,28 @@ const styles = StyleSheet.create({
   },
   AugTxt: {
     fontSize: 30,
-    left: -20,
+    // left: -20,
+    color: 'grey',
+    fontWeight: 'bold',
+    // marginLeft: 80,
+  },
+  TodayTxt: {
+    fontSize: 22,
+    // left: -20,
     color: 'grey',
     fontWeight: 'bold',
     // marginLeft: 80,
   },
   monthContainer: {
-    height: 60,
+    height: 50,
     width: 400,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 10,
+
     // backgroundColor: 'yellow',
-    justifyContent: 'center',
-    alignItems: 'flex-end',
+    // justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

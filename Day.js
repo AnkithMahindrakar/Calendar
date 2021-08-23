@@ -3,25 +3,36 @@ import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 
 // create a component
-const Day = ({date, isCurrentDay}) => {
-  //   console.log(isCurrentDay);
+const Day = ({date, isCurrentDay, borders}) => {
+  // console.log(particularClick);
+  // console.log(borders);
+
   return (
+    // <TouchableOpacity>
     <View
       style={{
         ...styles.eachContainer,
         ...{
           backgroundColor: isCurrentDay ? 'grey' : 'white',
-          borderWidth: date === 'padding' ? 0 : 1,
+          borderWidth: date === 'padding' ? 0 : borders === date ? 1.5 : 1,
+          borderColor: borders === date ? '#008da6' : '#ccc',
         },
       }}>
       <Text
         style={{
           ...styles.dateTxt,
-          ...{color: isCurrentDay ? 'white' : 'grey'},
+          ...{
+            color: isCurrentDay
+              ? 'white'
+              : borders === date
+              ? '#008da6'
+              : 'grey',
+          },
         }}>
-        {date === 'padding' ? '' : date}
+        {date === 'padding' ? null : date}
       </Text>
     </View>
+    // </TouchableOpacity>
   );
 };
 
@@ -31,7 +42,7 @@ const styles = StyleSheet.create({
     height: 50,
     width: 50,
     margin: 3.5,
-    borderColor: 'black',
+    borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 30,
     justifyContent: 'center',
